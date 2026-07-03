@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.report.widget.mapper.InvestDashboardWidgetMapper">
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.report.widget.domain.InvestDashboardWidget">
+        <id column="widget_id" property="widgetId"/>
+        <result column="widget_code" property="widgetCode"/>
+        <result column="widget_name" property="widgetName"/>
+        <result column="widget_type" property="widgetType"/>
+        <result column="title" property="title"/>
+        <result column="icon" property="icon"/>
+        <result column="data_key" property="dataKey"/>
+        <result column="config_id" property="configId"/>
+        <result column="width" property="width"/>
+        <result column="height" property="height"/>
+        <result column="position_x" property="positionX"/>
+        <result column="position_y" property="positionY"/>
+        <result column="color" property="color"/>
+        <result column="display_config" property="displayConfig"/>
+        <result column="status" property="status"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    <sql id="cols">widget_id,widget_code,widget_name,widget_type,title,icon,data_key,config_id,width,height,position_x,position_y,color,display_config,status,order_num,del_flag,create_by,create_time,update_by,update_time,remark</sql>
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="cols"/> FROM invest_dashboard_widget WHERE widget_id=#{id} AND del_flag='0'
+    </select>
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="cols"/> FROM invest_dashboard_widget WHERE del_flag='0'
+        <if test="widgetName!=null and widgetName!=''"> AND widget_name LIKE CONCAT('%',#{widgetName},'%')</if>
+        <if test="widgetType!=null and widgetType!=''"> AND widget_type=#{widgetType}</if>
+        <if test="status!=null and status!=''"> AND status=#{status}</if>
+        ORDER BY order_num ASC
+    </select>
+    <select id="selectAllEnabled" resultMap="BaseResultMap">
+        SELECT <include refid="cols"/> FROM invest_dashboard_widget WHERE status='0' AND del_flag='0' ORDER BY order_num ASC
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="widgetId">
+        INSERT INTO invest_dashboard_widget(widget_code,widget_name,widget_type,title,icon,data_key,config_id,width,height,position_x,position_y,color,display_config,status,order_num,del_flag,create_by,create_time,remark)
+        VALUES(#{widgetCode},#{widgetName},#{widgetType},#{title},#{icon},#{dataKey},#{configId},#{width},#{height},#{positionX},#{positionY},#{color},#{displayConfig},#{status},#{orderNum},#{delFlag},#{createBy},#{createTime},#{remark})
+    </insert>
+    <update id="update">
+        UPDATE invest_dashboard_widget
+        <set>
+            <if test="widgetCode!=null">widget_code=#{widgetCode},</if>
+            <if test="widgetName!=null">widget_name=#{widgetName},</if>
+            <if test="widgetType!=null">widget_type=#{widgetType},</if>
+            <if test="title!=null">title=#{title},</if>
+            <if test="icon!=null">icon=#{icon},</if>
+            <if test="dataKey!=null">data_key=#{dataKey},</if>
+            <if test="configId!=null">config_id=#{configId},</if>
+            <if test="width!=null">width=#{width},</if>
+            <if test="height!=null">height=#{height},</if>
+            <if test="positionX!=null">position_x=#{positionX},</if>
+            <if test="positionY!=null">position_y=#{positionY},</if>
+            <if test="color!=null">color=#{color},</if>
+            <if test="displayConfig!=null">display_config=#{displayConfig},</if>
+            <if test="status!=null">status=#{status},</if>
+            <if test="orderNum!=null">order_num=#{orderNum},</if>
+            <if test="updateBy!=null">update_by=#{updateBy},</if>
+            <if test="updateTime!=null">update_time=#{updateTime},</if>
+        </set>
+        WHERE widget_id=#{widgetId}
+    </update>
+    <delete id="deleteByIds">
+        UPDATE invest_dashboard_widget SET del_flag='2' WHERE widget_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </delete>
+</mapper>

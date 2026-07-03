@@ -1,0 +1,2 @@
+package com.ruoyi.modules.invest.benefit.evaluation.mapper;
+import com.ruoyi.modules.invest.benefit.evaluation.domain.InvestBenefitEvaluation;import org.apache.ibatis.annotations.Mapper;import java.util.List;@Mapper public interface InvestBenefitEvaluationMapper{InvestBenefitEvaluation selectById(Long id);List<InvestBenefitEvaluation> selectList(InvestBenefitEvaluation e);int insert(InvestBenefitEvaluation e);int update(InvestBenefitEvaluation e);int deleteByIds(Long[] ids);}

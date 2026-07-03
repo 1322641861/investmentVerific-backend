@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.plan.scheme.mapper.PlanSchemeMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.plan.scheme.domain.PlanScheme">
+        <id column="scheme_id" property="schemeId"/>
+        <result column="scheme_code" property="schemeCode"/>
+        <result column="scheme_name" property="schemeName"/>
+        <result column="scheme_type" property="schemeType"/>
+        <result column="plan_year" property="planYear"/>
+        <result column="lead_dept_id" property="leadDeptId"/>
+        <result column="lead_dept_name" property="leadDeptName"/>
+        <result column="leader_id" property="leaderId"/>
+        <result column="leader_name" property="leaderName"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="scheme_status" property="schemeStatus"/>
+        <result column="version_no" property="versionNo"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="attachments" property="attachments"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <collection property="tagList" ofType="com.ruoyi.modules.invest.plan.scheme.domain.PlanSchemeTag" javaType="java.util.ArrayList">
+            <id column="tag_id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+            <result column="tag_color" property="tagColor"/>
+            <result column="order_num" property="orderNum"/>
+            <result column="tag_status" property="status"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ps.scheme_id, ps.scheme_code, ps.scheme_name, ps.scheme_type, ps.plan_year, ps.lead_dept_id,
+        ps.lead_dept_name, ps.leader_id, ps.leader_name, ps.total_amount, ps.scheme_status,
+        ps.version_no, ps.process_instance_id, ps.attachments, ps.del_flag, ps.create_by,
+        ps.create_time, ps.update_by, ps.update_time, ps.remark
+    </sql>
+
+    <select id="selectPlanSchemeById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>,
+               pst.tag_id, pst.tag_name, pst.tag_color, pst.order_num, pst.status AS tag_status
+        FROM plan_scheme ps
+        LEFT JOIN plan_scheme_tag_rel pstr ON ps.scheme_id = pstr.scheme_id
+        LEFT JOIN plan_scheme_tag pst ON pstr.tag_id = pst.tag_id
+        WHERE ps.scheme_id = #{schemeId} AND ps.del_flag = '0'
+    </select>
+
+    <select id="selectPlanSchemeList" parameterType="PlanScheme" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>,
+               pst.tag_id, pst.tag_name, pst.tag_color, pst.order_num, pst.status AS tag_status
+        FROM plan_scheme ps
+        LEFT JOIN plan_scheme_tag_rel pstr ON ps.scheme_id = pstr.scheme_id
+        LEFT JOIN plan_scheme_tag pst ON pstr.tag_id = pst.tag_id
+        WHERE ps.del_flag = '0'
+        <if test="schemeCode != null and schemeCode != ''">
+            AND ps.scheme_code LIKE CONCAT('%', #{schemeCode}, '%')
+        </if>
+        <if test="schemeName != null and schemeName != ''">
+            AND ps.scheme_name LIKE CONCAT('%', #{schemeName}, '%')
+        </if>
+        <if test="schemeType != null and schemeType != ''">
+            AND ps.scheme_type = #{schemeType}
+        </if>
+        <if test="schemeStatus != null and schemeStatus != ''">
+            AND ps.scheme_status = #{schemeStatus}
+        </if>
+        <if test="planYear != null">
+            AND ps.plan_year = #{planYear}
+        </if>
+        <if test="leadDeptId != null">
+            AND ps.lead_dept_id = #{leadDeptId}
+        </if>
+        ORDER BY ps.create_time DESC, ps.scheme_id DESC
+    </select>
+
+    <insert id="insertPlanScheme" parameterType="PlanScheme" useGeneratedKeys="true" keyProperty="schemeId">
+        INSERT INTO plan_scheme (
+            scheme_code, scheme_name, scheme_type, plan_year, lead_dept_id, lead_dept_name,
+            leader_id, leader_name, total_amount, scheme_status, version_no, process_instance_id,
+            attachments, del_flag, create_by, create_time, remark
+        ) VALUES (
+            #{schemeCode}, #{schemeName}, #{schemeType}, #{planYear}, #{leadDeptId}, #{leadDeptName},
+            #{leaderId}, #{leaderName}, #{totalAmount}, #{schemeStatus}, #{versionNo}, #{processInstanceId},
+            #{attachments}, #{delFlag}, #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <update id="updatePlanScheme" parameterType="PlanScheme">
+        UPDATE plan_scheme
+        <set>
+            <if test="schemeCode != null">scheme_code = #{schemeCode},</if>
+            <if test="schemeName != null">scheme_name = #{schemeName},</if>
+            <if test="schemeType != null">scheme_type = #{schemeType},</if>
+            <if test="planYear != null">plan_year = #{planYear},</if>
+            <if test="leadDeptId != null">lead_dept_id = #{leadDeptId},</if>
+            <if test="leadDeptName != null">lead_dept_name = #{leadDeptName},</if>
+            <if test="leaderId != null">leader_id = #{leaderId},</if>
+            <if test="leaderName != null">leader_name = #{leaderName},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="schemeStatus != null">scheme_status = #{schemeStatus},</if>
+            <if test="versionNo != null">version_no = #{versionNo},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="attachments != null">attachments = #{attachments},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE scheme_id = #{schemeId} AND del_flag = '0'
+    </update>
+
+    <update id="updateSchemeStatus" parameterType="PlanScheme">
+        UPDATE plan_scheme
+        SET scheme_status = #{schemeStatus},
+            process_instance_id = #{processInstanceId},
+            update_by = #{updateBy},
+            update_time = #{updateTime}
+        WHERE scheme_id = #{schemeId} AND del_flag = '0'
+    </update>
+
+    <delete id="deletePlanSchemeById" parameterType="Long">
+        UPDATE plan_scheme SET del_flag = '2' WHERE scheme_id = #{schemeId}
+    </delete>
+
+    <delete id="deletePlanSchemeByIds">
+        UPDATE plan_scheme SET del_flag = '2' WHERE scheme_id IN
+        <foreach item="schemeId" collection="array" open="(" separator="," close=")">
+            #{schemeId}
+        </foreach>
+    </delete>
+</mapper>

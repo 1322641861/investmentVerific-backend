@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.modules.invest.message.mapper.InvestMessageMapper">
+
+    <resultMap type="com.ruoyi.modules.invest.message.domain.InvestMessage" id="MessageResult">
+        <id column="message_id" property="messageId"/>
+        <result column="message_code" property="messageCode"/>
+        <result column="message_type" property="messageType"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="receiver_id" property="receiverId"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="sender_id" property="senderId"/>
+        <result column="sender_name" property="senderName"/>
+        <result column="business_type" property="businessType"/>
+        <result column="business_id" property="businessId"/>
+        <result column="business_url" property="businessUrl"/>
+        <result column="is_read" property="isRead"/>
+        <result column="read_time" property="readTime"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="selectVo">
+        SELECT message_id, message_code, message_type, title, content,
+               receiver_id, receiver_name, sender_id, sender_name,
+               business_type, business_id, business_url,
+               is_read, read_time, del_flag, create_by, create_time
+        FROM invest_message
+    </sql>
+
+    <select id="selectById" resultMap="MessageResult">
+        <include refid="selectVo"/> WHERE message_id = #{messageId}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.modules.invest.message.domain.InvestMessage" resultMap="MessageResult">
+        <include refid="selectVo"/>
+        <where> del_flag = '0'
+            <if test="receiverId != null"> AND receiver_id = #{receiverId}</if>
+            <if test="messageType != null and messageType != ''"> AND message_type = #{messageType}</if>
+            <if test="isRead != null and isRead != ''"> AND is_read = #{isRead}</if>
+            <if test="title != null and title != ''"> AND title LIKE CONCAT('%', #{title}, '%')</if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectUnreadCount" resultType="Long">
+        SELECT COUNT(*) FROM invest_message
+        WHERE receiver_id = #{receiverId} AND is_read = '0' AND del_flag = '0'
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.modules.invest.message.domain.InvestMessage" useGeneratedKeys="true" keyProperty="messageId">
+        INSERT INTO invest_message (message_code, message_type, title, content,
+            receiver_id, receiver_name, sender_id, sender_name,
+            business_type, business_id, business_url,
+            is_read, del_flag, create_by, create_time)
+        VALUES (#{messageCode}, #{messageType}, #{title}, #{content},
+            #{receiverId}, #{receiverName}, #{senderId}, #{senderName},
+            #{businessType}, #{businessId}, #{businessUrl},
+            '0', '0', #{createBy}, #{createTime})
+    </insert>
+
+    <update id="markRead">
+        UPDATE invest_message SET is_read = '1', read_time = #{readTime}
+        WHERE message_id = #{messageId}
+    </update>
+
+    <update id="markAllRead">
+        UPDATE invest_message SET is_read = '1', read_time = #{readTime}
+        WHERE receiver_id = #{receiverId} AND is_read = '0' AND del_flag = '0'
+    </update>
+
+    <update id="deleteByIds" parameterType="Long">
+        UPDATE invest_message SET del_flag = '2'
+        WHERE message_id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+</mapper>

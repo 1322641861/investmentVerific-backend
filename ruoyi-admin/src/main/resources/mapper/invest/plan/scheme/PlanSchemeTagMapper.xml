@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.plan.scheme.mapper.PlanSchemeTagMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.plan.scheme.domain.PlanSchemeTag">
+        <id column="tag_id" property="tagId"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="tag_color" property="tagColor"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="status" property="status"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tag_id, tag_name, tag_color, order_num, status, create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <sql id="Table_Alias_Column_List">
+        t.tag_id, t.tag_name, t.tag_color, t.order_num, t.status, t.create_by, t.create_time, t.update_by, t.update_time, t.remark
+    </sql>
+
+    <select id="selectPlanSchemeTagById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM plan_scheme_tag
+        WHERE tag_id = #{tagId}
+    </select>
+
+    <select id="selectPlanSchemeTagList" parameterType="PlanSchemeTag" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM plan_scheme_tag
+        WHERE 1 = 1
+        <if test="tagName != null and tagName != ''">
+            AND tag_name LIKE CONCAT('%', #{tagName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        ORDER BY order_num ASC, tag_id ASC
+    </select>
+
+    <select id="selectTagsBySchemeId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Table_Alias_Column_List"/>
+        FROM plan_scheme_tag t
+        INNER JOIN plan_scheme_tag_rel r ON t.tag_id = r.tag_id
+        WHERE r.scheme_id = #{schemeId}
+        ORDER BY t.order_num ASC, t.tag_id ASC
+    </select>
+
+    <insert id="insertPlanSchemeTag" parameterType="PlanSchemeTag" useGeneratedKeys="true" keyProperty="tagId">
+        INSERT INTO plan_scheme_tag (
+            tag_name, tag_color, order_num, status, create_by, create_time, remark
+        ) VALUES (
+            #{tagName}, #{tagColor}, #{orderNum}, #{status}, #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <update id="updatePlanSchemeTag" parameterType="PlanSchemeTag">
+        UPDATE plan_scheme_tag
+        <set>
+            <if test="tagName != null">tag_name = #{tagName},</if>
+            <if test="tagColor != null">tag_color = #{tagColor},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE tag_id = #{tagId}
+    </update>
+
+    <delete id="deletePlanSchemeTagByIds">
+        DELETE FROM plan_scheme_tag WHERE tag_id IN
+        <foreach item="tagId" collection="array" open="(" separator="," close=")">
+            #{tagId}
+        </foreach>
+    </delete>
+</mapper>

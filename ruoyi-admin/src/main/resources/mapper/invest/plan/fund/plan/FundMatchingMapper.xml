@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.modules.invest.plan.fund.plan.mapper.FundMatchingMapper">
+
+    <resultMap id="StatResultMap" type="com.ruoyi.modules.invest.plan.fund.plan.domain.dto.FundMatchingStatVO">
+        <result column="plan_id" property="planId" />
+        <result column="project_id" property="projectId" />
+        <result column="project_name" property="projectName" />
+        <result column="budget_amount" property="budgetAmount" />
+        <result column="plan_total" property="planTotal" />
+        <result column="arrived_total" property="arrivedTotal" />
+        <result column="paid_total" property="paidTotal" />
+        <result column="match_rate" property="matchRate" />
+        <result column="arrived_rate" property="arrivedRate" />
+        <result column="paid_rate" property="paidRate" />
+        <result column="plan_status" property="planStatus" />
+        <result column="last_check_time" property="lastCheckTime" />
+        <result column="warning_level" property="warningLevel" />
+    </resultMap>
+
+    <resultMap id="TrendResultMap" type="com.ruoyi.modules.invest.plan.fund.plan.domain.dto.FundMatchingTrendVO">
+        <result column="check_time" property="checkTime" />
+        <result column="match_rate" property="matchRate" />
+        <result column="arrived_rate" property="arrivedRate" />
+        <result column="paid_rate" property="paidRate" />
+    </resultMap>
+
+    <resultMap id="SourceResultMap" type="com.ruoyi.modules.invest.plan.fund.plan.domain.dto.FundSourceMatchingVO">
+        <result column="source_id" property="sourceId" />
+        <result column="source_name" property="sourceName" />
+        <result column="source_type" property="sourceType" />
+        <result column="planned_amount" property="plannedAmount" />
+        <result column="arrived_amount" property="arrivedAmount" />
+        <result column="paid_amount" property="paidAmount" />
+        <result column="source_arrived_rate" property="sourceArrivedRate" />
+    </resultMap>
+
+    <!-- 配套率汇总列表 -->
+    <select id="selectMatchingStatList" resultMap="StatResultMap">
+        SELECT
+            fp.plan_id,
+            fp.project_id,
+            COALESCE(p.project_name, fp.project_name) AS project_name,
+            fp.budget_amount,
+            fp.plan_total,
+            fp.arrived_total,
+            fp.paid_total,
+            fp.match_rate,
+            CASE
+                WHEN fp.budget_amount > 0
+                THEN ROUND((fp.arrived_total / fp.budget_amount) * 100, 2)
+                ELSE 0
+            END AS arrived_rate,
+            CASE
+                WHEN fp.arrived_total > 0
+                THEN ROUND((fp.paid_total / fp.arrived_total) * 100, 2)
+                ELSE 0
+            END AS paid_rate,
+            fp.plan_status,
+            fp.last_check_time,
+            CASE
+                WHEN fp.match_rate >= 90 THEN 'green'
+                WHEN fp.match_rate >= 80 THEN 'yellow'
+                ELSE 'red'
+            END AS warning_level
+        FROM invest_fund_plan fp
+        LEFT JOIN invest_project p ON fp.project_id = p.project_id
+        WHERE fp.del_flag = '0'
+        <if test="projectName != null and projectName != ''">
+            AND (p.project_name LIKE CONCAT('%', #{projectName}, '%') OR fp.project_name LIKE CONCAT('%', #{projectName}, '%'))
+        </if>
+        <if test="planStatus != null and planStatus != ''">
+            AND fp.plan_status = #{planStatus}
+        </if>
+        <if test="matchRateLow != null and matchRateLow != ''">
+            AND fp.match_rate >= #{matchRateLow}
+        </if>
+        <if test="matchRateHigh != null and matchRateHigh != ''">
+            AND fp.match_rate &lt;= #{matchRateHigh}
+        </if>
+        ORDER BY fp.match_rate ASC
+    </select>
+
+    <!-- 配套率趋势 -->
+    <select id="selectMatchingTrend" resultMap="TrendResultMap">
+        SELECT
+            cl.create_time AS check_time,
+            cl.match_rate,
+            cl.arrived_rate,
+            cl.paid_rate
+        FROM invest_fund_check_log cl
+        WHERE cl.plan_id = #{planId}
+        ORDER BY cl.create_time ASC
+    </select>
+
+    <!-- 资金来源配套明细 -->
+    <select id="selectSourceMatching" resultMap="SourceResultMap">
+        SELECT
+            fpi.source_id,
+            COALESCE(s.source_name, '未知来源') AS source_name,
+            s.source_type,
+            fpi.planned_amount,
+            fpi.arrived_amount,
+            fpi.paid_amount,
+            CASE
+                WHEN fpi.planned_amount > 0
+                THEN ROUND((fpi.arrived_amount / fpi.planned_amount) * 100, 2)
+                ELSE 0
+            END AS source_arrived_rate
+        FROM invest_fund_plan_item fpi
+        LEFT JOIN invest_fund_source s ON fpi.source_id = s.source_id
+        WHERE fpi.plan_id = #{planId}
+        ORDER BY fpi.order_num
+    </select>
+
+    <!-- 统计卡片 -->
+    <select id="countTotalPlans" resultType="Long">
+        SELECT COUNT(*) FROM invest_fund_plan WHERE del_flag = '0'
+    </select>
+
+    <select id="avgMatchRate" resultType="Double">
+        SELECT ROUND(AVG(COALESCE(match_rate, 0)), 2) FROM invest_fund_plan WHERE del_flag = '0'
+    </select>
+
+    <select id="countLowMatchRate" resultType="Long">
+        SELECT COUNT(*) FROM invest_fund_plan WHERE del_flag = '0' AND match_rate &lt; #{threshold}
+    </select>
+
+    <select id="avgArrivedRate" resultType="Double">
+        SELECT ROUND(AVG(COALESCE(arrived_total / NULLIF(budget_amount, 0) * 100, 0)), 2)
+        FROM invest_fund_plan WHERE del_flag = '0' AND budget_amount > 0
+    </select>
+
+</mapper>

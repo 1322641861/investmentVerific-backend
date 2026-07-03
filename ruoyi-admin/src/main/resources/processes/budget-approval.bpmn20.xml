@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:flowable="http://flowable.org/bpmn"
+    targetNamespace="http://www.flowable.org/processdef"
+    id="definitions">
+
+  <process id="budget_approval" name="预算审批流程" isExecutable="true">
+
+    <startEvent id="start" name="开始审批"></startEvent>
+
+    <userTask id="task1" name="部门经理审核预算"
+              flowable:assignee="${managerUserId}"
+              flowable:candidateUsers="${managerRole}">
+      <documentation>请审核预算内容</documentation>
+    </userTask>
+
+    <exclusiveGateway id="gateway1" name="部门经理审核结果判断"></exclusiveGateway>
+
+    <userTask id="task2" name="财务审核"
+              flowable:assignee="${financeUserId}"
+              flowable:candidateUsers="${financeRole}">
+      <documentation>请详细审核预算</documentation>
+    </userTask>
+
+    <exclusiveGateway id="gateway2" name="财务审核结果判断"></exclusiveGateway>
+
+    <userTask id="task3" name="总经理审批"
+              flowable:assignee="${gmUserId}"
+              flowable:candidateUsers="${gmRole}">
+      <documentation>请最终审批预算</documentation>
+    </userTask>
+
+    <endEvent id="endApproved" name="审批通过">
+      <documentation>预算审批通过</documentation>
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${processStatusExecutionListener}" />
+      </extensionElements>
+    </endEvent>
+
+    <endEvent id="endRejected" name="审批驳回">
+      <documentation>预算审批驳回</documentation>
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${processStatusExecutionListener}" />
+      </extensionElements>
+    </endEvent>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="task1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="gateway1"></sequenceFlow>
+
+    <sequenceFlow id="flowApproved1" sourceRef="gateway1" targetRef="task2" name="通过">
+      <conditionExpression xsi:type="tFormalExpression">${outcome == 'approve'}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowRejected1" sourceRef="gateway1" targetRef="endRejected" name="驳回">
+      <conditionExpression xsi:type="tFormalExpression">${outcome == 'reject'}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="gateway2"></sequenceFlow>
+
+    <sequenceFlow id="flowApproved2" sourceRef="gateway2" targetRef="task3" name="通过">
+      <conditionExpression xsi:type="tFormalExpression">${outcome == 'approve'}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowRejected2" sourceRef="gateway2" targetRef="endRejected" name="驳回">
+      <conditionExpression xsi:type="tFormalExpression">${outcome == 'reject'}</conditionExpression>
+    </sequenceFlow>
+
+    <exclusiveGateway id="gateway3" name="总经理审批判断"></exclusiveGateway>
+    <sequenceFlow id="flow4" sourceRef="task3" targetRef="gateway3"></sequenceFlow>
+
+    <sequenceFlow id="flowApproved3" sourceRef="gateway3" targetRef="endApproved" name="通过">
+      <conditionExpression xsi:type="tFormalExpression">${outcome == 'approve'}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowRejected3" sourceRef="gateway3" targetRef="endRejected" name="驳回">
+      <conditionExpression xsi:type="tFormalExpression">${outcome == 'reject'}</conditionExpression>
+    </sequenceFlow>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_budget-approval">
+    <bpmndi:BPMNPlane id="BPMNPlane_budget_approval" bpmnElement="budget_approval">
+      <bpmndi:BPMNShape id="start_shape" bpmnElement="start" isMarkerVisible="true">
+        <dc:Bounds x="100" y="100" width="30" height="30"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="task1_shape" bpmnElement="task1" isMarkerVisible="true">
+        <dc:Bounds x="200" y="80" width="100" height="80"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway1_shape" bpmnElement="gateway1" isMarkerVisible="true">
+        <dc:Bounds x="360" y="100" width="40" height="40"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="task2_shape" bpmnElement="task2" isMarkerVisible="true">
+        <dc:Bounds x="450" y="80" width="100" height="80"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway2_shape" bpmnElement="gateway2" isMarkerVisible="true">
+        <dc:Bounds x="600" y="100" width="40" height="40"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="task3_shape" bpmnElement="task3" isMarkerVisible="true">
+        <dc:Bounds x="690" y="80" width="100" height="80"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway3_shape" bpmnElement="gateway3" isMarkerVisible="true">
+        <dc:Bounds x="840" y="100" width="40" height="40"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endApproved_shape" bpmnElement="endApproved" isMarkerVisible="true">
+        <dc:Bounds x="950" y="100" width="30" height="30"></dc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endRejected_shape" bpmnElement="endRejected" isMarkerVisible="true">
+        <dc:Bounds x="360" y="250" width="30" height="30"></dc:Bounds>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -317,14 +317,22 @@ public class ShiroConfig
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/ruoyi/**", "anon");
         filterChainDefinitionMap.put("/captcha/captchaImage**", "anon");
+        // Vue前端JSON接口放行
+        filterChainDefinitionMap.put("/captchaImage**", "anon");
+        filterChainDefinitionMap.put("/login", "anon");
+        filterChainDefinitionMap.put("/logout", "anon");
+        filterChainDefinitionMap.put("/register", "anon");
+        filterChainDefinitionMap.put("/unauth-json", "anon");
+        filterChainDefinitionMap.put("/getInfo", "anon");
+        filterChainDefinitionMap.put("/getRouters", "anon");
         // 匿名访问不鉴权注解列表
         permitAllUrl.getUrls().forEach(url -> filterChainDefinitionMap.put(url, "anon"));
-        // 退出 logout地址，shiro去清除session
-        filterChainDefinitionMap.put("/logout", "logout");
-        // 不需要拦截的访问
-        filterChainDefinitionMap.put("/login", "anon,captchaValidate");
+        // 退出 logout地址，Vue前端JSON退出接口由Controller处理
+        // filterChainDefinitionMap.put("/logout", "logout");
+        // 不需要拦截的访问（Vue前端JSON登录接口由VueLoginController自行处理验证码）
+        filterChainDefinitionMap.put("/login", "anon");
         // 注册相关
-        filterChainDefinitionMap.put("/register", "anon,captchaValidate");
+        filterChainDefinitionMap.put("/register", "anon");
         // 系统权限列表
         // filterChainDefinitionMap.putAll(SpringUtils.getBean(IMenuService.class).selectPermsAll());
 

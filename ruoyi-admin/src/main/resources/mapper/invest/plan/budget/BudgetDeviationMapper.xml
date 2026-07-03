@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.modules.invest.plan.budget.mapper.BudgetDeviationMapper">
+
+    <resultMap id="DeviationResultMap" type="com.ruoyi.modules.invest.plan.budget.domain.dto.BudgetDeviationVO">
+        <result column="budget_id" property="budgetId" />
+        <result column="budget_code" property="budgetCode" />
+        <result column="budget_name" property="budgetName" />
+        <result column="plan_year" property="planYear" />
+        <result column="scheme_name" property="schemeName" />
+        <result column="total_budget" property="totalBudget" />
+        <result column="allocated_amount" property="allocatedAmount" />
+        <result column="actual_paid" property="actualPaid" />
+        <result column="deviation_amount" property="deviationAmount" />
+        <result column="deviation_rate" property="deviationRate" />
+        <result column="execution_rate" property="executionRate" />
+        <result column="budget_status" property="budgetStatus" />
+    </resultMap>
+
+    <resultMap id="ProjectDeviationResultMap" type="com.ruoyi.modules.invest.plan.budget.domain.dto.ProjectDeviationVO">
+        <result column="project_id" property="projectId" />
+        <result column="project_name" property="projectName" />
+        <result column="budget_amount" property="budgetAmount" />
+        <result column="allocated_amount" property="allocatedAmount" />
+        <result column="paid_amount" property="paidAmount" />
+        <result column="deviation_amount" property="deviationAmount" />
+        <result column="deviation_rate" property="deviationRate" />
+        <result column="execution_rate" property="executionRate" />
+    </resultMap>
+
+    <resultMap id="MonthlyTrendResultMap" type="com.ruoyi.modules.invest.plan.budget.domain.dto.MonthlyTrendVO">
+        <result column="month" property="month" />
+        <result column="budget_amount" property="budgetAmount" />
+        <result column="actual_amount" property="actualAmount" />
+        <result column="execution_rate" property="executionRate" />
+    </resultMap>
+
+    <!-- 预算执行偏差汇总 -->
+    <select id="selectDeviationList" parameterType="com.ruoyi.modules.invest.plan.budget.domain.dto.BudgetDeviationQuery"
+            resultMap="DeviationResultMap">
+        SELECT
+            b.budget_id,
+            b.budget_code,
+            b.budget_name,
+            b.plan_year,
+            ps.scheme_name,
+            b.total_budget,
+            b.allocated_amount,
+            COALESCE(fp.paid_total, 0) AS actual_paid,
+            (b.allocated_amount - COALESCE(fp.paid_total, 0)) AS deviation_amount,
+            CASE
+                WHEN b.allocated_amount > 0
+                THEN ROUND((COALESCE(fp.paid_total, 0) / b.allocated_amount) * 100, 2)
+                ELSE 0
+            END AS deviation_rate,
+            CASE
+                WHEN b.allocated_amount > 0
+                THEN ROUND((COALESCE(fp.paid_total, 0) / b.allocated_amount) * 100, 2)
+                ELSE 0
+            END AS execution_rate,
+            b.budget_status
+        FROM invest_budget b
+        LEFT JOIN invest_fund_plan fp ON b.budget_id = fp.budget_id
+        LEFT JOIN plan_scheme ps ON b.scheme_id = ps.scheme_id
+        WHERE b.del_flag = '0'
+          AND b.budget_status IN ('2', '3')
+        <if test="planYear != null">
+            AND b.plan_year = #{planYear}
+        </if>
+        <if test="schemeId != null">
+            AND b.scheme_id = #{schemeId}
+        </if>
+        <if test="budgetId != null">
+            AND b.budget_id = #{budgetId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (b.budget_code LIKE CONCAT('%', #{keyword}, '%') OR b.budget_name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY b.plan_year DESC, b.budget_code
+    </select>
+
+    <!-- 项目级偏差明细 -->
+    <select id="selectProjectDeviation" resultMap="ProjectDeviationResultMap">
+        SELECT
+            bi.project_id,
+            bi.project_name,
+            bi.proposed_amount AS budget_amount,
+            bi.allocated_amount,
+            COALESCE(fp.paid_total, 0) AS paid_amount,
+            (bi.allocated_amount - COALESCE(fp.paid_total, 0)) AS deviation_amount,
+            CASE
+                WHEN bi.allocated_amount > 0
+                THEN ROUND(((bi.allocated_amount - COALESCE(fp.paid_total, 0)) / bi.allocated_amount) * 100, 2)
+                ELSE 0
+            END AS deviation_rate,
+            CASE
+                WHEN bi.allocated_amount > 0
+                THEN ROUND((COALESCE(fp.paid_total, 0) / bi.allocated_amount) * 100, 2)
+                ELSE 0
+            END AS execution_rate
+        FROM invest_budget_item bi
+        LEFT JOIN invest_fund_plan fp ON bi.budget_item_id = fp.budget_item_id
+        WHERE bi.budget_id = #{budgetId}
+        ORDER BY bi.order_num
+    </select>
+
+    <!-- 月度执行趋势 -->
+    <select id="selectMonthlyTrend" resultMap="MonthlyTrendResultMap">
+        SELECT
+            DATE_FORMAT(p.pay_date, '%Y-%m') AS month,
+            0 AS budget_amount,
+            SUM(p.paid_amount) AS actual_amount,
+            0 AS execution_rate
+        FROM invest_fund_payment p
+        WHERE p.pay_status = '3'
+          AND p.project_id IN (
+              SELECT bi.project_id
+              FROM invest_budget_item bi
+              WHERE bi.budget_id = #{budgetId}
+          )
+          AND p.pay_date >= #{startDate}
+          AND p.pay_date &lt;= #{endDate}
+        GROUP BY DATE_FORMAT(p.pay_date, '%Y-%m')
+        ORDER BY month
+    </select>
+
+    <!-- 查询单个预算的汇总偏差 -->
+    <select id="selectDeviationSummary" resultMap="DeviationResultMap">
+        SELECT
+            b.budget_id,
+            b.budget_code,
+            b.budget_name,
+            b.plan_year,
+            ps.scheme_name,
+            b.total_budget,
+            b.allocated_amount,
+            COALESCE(fp.paid_total, 0) AS actual_paid,
+            (b.allocated_amount - COALESCE(fp.paid_total, 0)) AS deviation_amount,
+            CASE
+                WHEN b.allocated_amount > 0
+                THEN ROUND((COALESCE(fp.paid_total, 0) / b.allocated_amount) * 100, 2)
+                ELSE 0
+            END AS execution_rate,
+            b.budget_status
+        FROM invest_budget b
+        LEFT JOIN invest_fund_plan fp ON b.budget_id = fp.budget_id
+        LEFT JOIN plan_scheme ps ON b.scheme_id = ps.scheme_id
+        WHERE b.budget_id = #{budgetId} AND b.del_flag = '0'
+    </select>
+
+    <!-- 按部门维度统计偏差 -->
+    <select id="selectDeviationByDept" resultType="java.util.Map">
+        SELECT
+            p.dept_name AS deptName,
+            COUNT(DISTINCT bi.budget_id) AS budgetCount,
+            COALESCE(SUM(bi.allocated_amount),0) AS allocatedAmount,
+            COALESCE(SUM(fp.paid_total),0) AS actualPaid,
+            (COALESCE(SUM(bi.allocated_amount),0) - COALESCE(SUM(fp.paid_total),0)) AS deviationAmount,
+            CASE WHEN COALESCE(SUM(bi.allocated_amount),0) > 0
+                THEN ROUND((COALESCE(SUM(fp.paid_total),0) / COALESCE(SUM(bi.allocated_amount),0)) * 100, 2)
+                ELSE 0 END AS executionRate
+        FROM invest_budget_item bi
+        LEFT JOIN invest_fund_plan fp ON bi.budget_item_id = fp.budget_item_id
+        LEFT JOIN invest_project p ON bi.project_id = p.project_id
+        WHERE bi.budget_id IN (SELECT budget_id FROM invest_budget WHERE del_flag='0' AND budget_status IN ('2','3'))
+        GROUP BY p.dept_name ORDER BY deviationAmount DESC
+    </select>
+
+    <!-- 按年度统计所有预算的汇总偏差 -->
+    <select id="selectDeviationSummaryByYear" resultMap="DeviationResultMap">
+        SELECT
+            b.budget_id,
+            b.budget_code,
+            b.budget_name,
+            b.plan_year,
+            ps.scheme_name,
+            b.total_budget,
+            b.allocated_amount,
+            COALESCE(SUM(fp.paid_total), 0) AS actual_paid,
+            (b.allocated_amount - COALESCE(SUM(fp.paid_total), 0)) AS deviation_amount,
+            CASE
+                WHEN b.allocated_amount > 0
+                THEN ROUND((COALESCE(SUM(fp.paid_total), 0) / b.allocated_amount) * 100, 2)
+                ELSE 0
+            END AS execution_rate,
+            b.budget_status
+        FROM invest_budget b
+        LEFT JOIN invest_fund_plan fp ON b.budget_id = fp.budget_id
+        LEFT JOIN plan_scheme ps ON b.scheme_id = ps.scheme_id
+        WHERE b.del_flag = '0' AND b.budget_status IN ('2', '3')
+        <if test="planYear != null">
+            AND b.plan_year = #{planYear}
+        </if>
+        GROUP BY b.budget_id, b.budget_code, b.budget_name, b.plan_year, ps.scheme_name,
+                 b.total_budget, b.allocated_amount, b.budget_status
+        ORDER BY b.plan_year DESC, b.budget_code
+    </select>
+
+</mapper>

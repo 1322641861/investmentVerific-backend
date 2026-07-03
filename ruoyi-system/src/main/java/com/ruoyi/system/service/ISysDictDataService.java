@@ -36,6 +36,14 @@ public interface ISysDictDataService
     public SysDictData selectDictDataById(Long dictCode);
 
     /**
+     * 根据字典类型查询字典数据
+     * 
+     * @param dictType 字典类型
+     * @return 字典数据集合信息
+     */
+    public List<SysDictData> selectDictDataByType(String dictType);
+
+    /**
      * 批量删除字典数据
      * 
      * @param ids 需要删除的数据

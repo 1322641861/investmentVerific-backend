@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.plan.budget.mapper.InvestBudgetMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.plan.budget.domain.InvestBudget">
+        <id column="budget_id" property="budgetId"/>
+        <result column="budget_code" property="budgetCode"/>
+        <result column="budget_name" property="budgetName"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="scheme_code" property="schemeCode"/>
+        <result column="scheme_name" property="schemeName"/>
+        <result column="plan_year" property="planYear"/>
+        <result column="total_budget" property="totalBudget"/>
+        <result column="allocated_amount" property="allocatedAmount"/>
+        <result column="remaining_amount" property="remainingAmount"/>
+        <result column="budget_status" property="budgetStatus"/>
+        <result column="version_no" property="versionNo"/>
+        <result column="last_check_status" property="lastCheckStatus"/>
+        <result column="last_check_time" property="lastCheckTime"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        budget_id, budget_code, budget_name, scheme_id, scheme_code, scheme_name, plan_year,
+        total_budget, allocated_amount, remaining_amount, budget_status, version_no,
+        last_check_status, last_check_time, process_instance_id, del_flag,
+        create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectInvestBudgetById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_budget
+        WHERE budget_id = #{budgetId} AND del_flag = '0'
+    </select>
+
+    <select id="selectInvestBudgetBySchemeId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_budget
+        WHERE scheme_id = #{schemeId} AND del_flag = '0'
+        LIMIT 1
+    </select>
+
+    <select id="selectInvestBudgetList" parameterType="InvestBudget" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_budget
+        WHERE del_flag = '0'
+        <if test="budgetCode != null and budgetCode != ''">AND budget_code LIKE CONCAT('%', #{budgetCode}, '%')</if>
+        <if test="budgetName != null and budgetName != ''">AND budget_name LIKE CONCAT('%', #{budgetName}, '%')</if>
+        <if test="schemeId != null">AND scheme_id = #{schemeId}</if>
+        <if test="schemeName != null and schemeName != ''">AND scheme_name LIKE CONCAT('%', #{schemeName}, '%')</if>
+        <if test="planYear != null">AND plan_year = #{planYear}</if>
+        <if test="budgetStatus != null and budgetStatus != ''">AND budget_status = #{budgetStatus}</if>
+        ORDER BY create_time DESC, budget_id DESC
+    </select>
+
+    <insert id="insertInvestBudget" parameterType="InvestBudget" useGeneratedKeys="true" keyProperty="budgetId">
+        INSERT INTO invest_budget (
+            budget_code, budget_name, scheme_id, scheme_code, scheme_name, plan_year,
+            total_budget, allocated_amount, remaining_amount, budget_status, version_no,
+            last_check_status, last_check_time, process_instance_id, del_flag,
+            create_by, create_time, remark
+        ) VALUES (
+            #{budgetCode}, #{budgetName}, #{schemeId}, #{schemeCode}, #{schemeName}, #{planYear},
+            #{totalBudget}, #{allocatedAmount}, #{remainingAmount}, #{budgetStatus}, #{versionNo},
+            #{lastCheckStatus}, #{lastCheckTime}, #{processInstanceId}, #{delFlag},
+            #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <update id="updateInvestBudget" parameterType="InvestBudget">
+        UPDATE invest_budget
+        <set>
+            <if test="budgetCode != null">budget_code = #{budgetCode},</if>
+            <if test="budgetName != null">budget_name = #{budgetName},</if>
+            <if test="schemeId != null">scheme_id = #{schemeId},</if>
+            <if test="schemeCode != null">scheme_code = #{schemeCode},</if>
+            <if test="schemeName != null">scheme_name = #{schemeName},</if>
+            <if test="planYear != null">plan_year = #{planYear},</if>
+            <if test="totalBudget != null">total_budget = #{totalBudget},</if>
+            <if test="allocatedAmount != null">allocated_amount = #{allocatedAmount},</if>
+            <if test="remainingAmount != null">remaining_amount = #{remainingAmount},</if>
+            <if test="budgetStatus != null">budget_status = #{budgetStatus},</if>
+            <if test="versionNo != null">version_no = #{versionNo},</if>
+            <if test="lastCheckStatus != null">last_check_status = #{lastCheckStatus},</if>
+            <if test="lastCheckTime != null">last_check_time = #{lastCheckTime},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE budget_id = #{budgetId} AND del_flag = '0'
+    </update>
+
+    <update id="updateBudgetAmounts" parameterType="InvestBudget">
+        UPDATE invest_budget
+        SET allocated_amount = #{allocatedAmount},
+            remaining_amount = #{remainingAmount},
+            update_by = #{updateBy},
+            update_time = #{updateTime}
+        WHERE budget_id = #{budgetId} AND del_flag = '0'
+    </update>
+
+    <update id="updateBudgetCheckStatus" parameterType="InvestBudget">
+        UPDATE invest_budget
+        SET last_check_status = #{lastCheckStatus},
+            last_check_time = #{lastCheckTime},
+            update_by = #{updateBy},
+            update_time = #{updateTime}
+        WHERE budget_id = #{budgetId} AND del_flag = '0'
+    </update>
+
+    <delete id="deleteInvestBudgetByIds">
+        UPDATE invest_budget SET del_flag = '2' WHERE budget_id IN
+        <foreach item="budgetId" collection="array" open="(" separator="," close=")">
+            #{budgetId}
+        </foreach>
+    </delete>
+</mapper>

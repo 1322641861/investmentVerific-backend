@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.system.config.mapper.SysBusinessConfigMapper">
+    <resultMap type="com.ruoyi.modules.system.config.domain.SysBusinessConfig" id="ConfigResult">
+        <id column="config_id" property="configId"/>
+        <result column="config_code" property="configCode"/>
+        <result column="config_name" property="configName"/>
+        <result column="config_value" property="configValue"/>
+        <result column="config_type" property="configType"/>
+        <result column="config_options" property="configOptions"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <sql id="selectVo">SELECT config_id,config_code,config_name,config_value,config_type,config_options,status,remark,create_by,create_time,update_by,update_time FROM sys_business_config</sql>
+    <select id="selectById" resultMap="ConfigResult"><include refid="selectVo"/> WHERE config_id=#{configId}</select>
+    <select id="selectByCode" resultMap="ConfigResult"><include refid="selectVo"/> WHERE config_code=#{configCode}</select>
+    <select id="selectList" resultMap="ConfigResult"><include refid="selectVo"/><where><if test="configCode!=null and configCode!=''">AND config_code LIKE CONCAT('%',#{configCode},'%')</if><if test="configName!=null and configName!=''">AND config_name LIKE CONCAT('%',#{configName},'%')</if></where>ORDER BY config_code</select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="configId">INSERT INTO sys_business_config(config_code,config_name,config_value,config_type,config_options,status,remark,create_by,create_time,update_by,update_time)VALUES(#{configCode},#{configName},#{configValue},#{configType},#{configOptions},#{status},#{remark},#{createBy},#{createTime},#{updateBy},#{updateTime})</insert>
+    <update id="update">UPDATE sys_business_config SET config_code=#{configCode},config_name=#{configName},config_value=#{configValue},config_type=#{configType},config_options=#{configOptions},status=#{status},remark=#{remark},update_by=#{updateBy},update_time=#{updateTime} WHERE config_id=#{configId}</update>
+    <delete id="deleteByIds">UPDATE sys_business_config SET del_flag='2' WHERE config_id IN<foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach></delete>
+</mapper>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.contract.mapper.InvestContractMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.contract.domain.InvestContract">
+        <id column="contract_id" property="contractId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="contract_no" property="contractNo"/>
+        <result column="contract_name" property="contractName"/>
+        <result column="contract_type" property="contractType"/>
+        <result column="invest_amount" property="investAmount"/>
+        <result column="share_ratio" property="shareRatio"/>
+        <result column="investor" property="investor"/>
+        <result column="funder" property="funder"/>
+        <result column="sign_date" property="signDate"/>
+        <result column="effective_date" property="effectiveDate"/>
+        <result column="expire_date" property="expireDate"/>
+        <result column="contract_status" property="contractStatus"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="file_path" property="filePath"/>
+        <result column="remark" property="remark"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        contract_id, project_id, project_name, contract_no, contract_name, contract_type, invest_amount,
+        share_ratio, investor, funder, sign_date, effective_date, expire_date, contract_status,
+        process_instance_id, file_path, remark, del_flag, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="selectInvestContractById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM invest_contract
+        WHERE contract_id = #{contractId} AND del_flag = '0'
+    </select>
+
+    <select id="selectInvestContractList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM invest_contract
+        WHERE del_flag = '0'
+        <if test="projectId != null">AND project_id = #{projectId}</if>
+        <if test="contractNo != null and contractNo != ''">
+            AND contract_no LIKE CONCAT('%', #{contractNo}, '%')
+        </if>
+        <if test="contractName != null and contractName != ''">
+            AND contract_name LIKE CONCAT('%', #{contractName}, '%')
+        </if>
+        <if test="contractStatus != null and contractStatus != ''">
+            AND contract_status = #{contractStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insertInvestContract" useGeneratedKeys="true" keyProperty="contractId">
+        INSERT INTO invest_contract (
+            project_id, project_name, contract_no, contract_name, contract_type, invest_amount,
+            share_ratio, investor, funder, sign_date, effective_date, expire_date, contract_status,
+            process_instance_id, file_path, remark, del_flag, create_by, create_time
+        ) VALUES (
+            #{projectId}, #{projectName}, #{contractNo}, #{contractName}, #{contractType}, #{investAmount},
+            #{shareRatio}, #{investor}, #{funder}, #{signDate}, #{effectiveDate}, #{expireDate}, #{contractStatus},
+            #{processInstanceId}, #{filePath}, #{remark}, #{delFlag}, #{createBy}, #{createTime}
+        )
+    </insert>
+
+    <update id="updateInvestContract">
+        UPDATE invest_contract
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="contractNo != null">contract_no = #{contractNo},</if>
+            <if test="contractName != null">contract_name = #{contractName},</if>
+            <if test="contractType != null">contract_type = #{contractType},</if>
+            <if test="investAmount != null">invest_amount = #{investAmount},</if>
+            <if test="shareRatio != null">share_ratio = #{shareRatio},</if>
+            <if test="contractStatus != null">contract_status = #{contractStatus},</if>
+            <if test="filePath != null">file_path = #{filePath},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE contract_id = #{contractId} AND del_flag = '0'
+    </update>
+
+    <delete id="deleteInvestContractByIds">
+        UPDATE invest_contract SET del_flag = '2' WHERE contract_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM invest_contract
+        WHERE project_id = #{projectId} AND del_flag = '0' ORDER BY create_time DESC
+    </select>
+</mapper>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.plan.fund.payment.mapper.InvestFundPaymentSplitMapper">
+  <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.plan.fund.payment.domain.InvestFundPaymentSplit">
+    <id column="split_id" property="splitId"/><result column="payment_id" property="paymentId"/><result column="item_id" property="itemId"/><result column="source_id" property="sourceId"/><result column="source_name" property="sourceName"/><result column="split_amount" property="splitAmount"/>
+  </resultMap>
+  <select id="selectSplitsByPaymentId" resultMap="BaseResultMap">SELECT split_id,payment_id,item_id,source_id,source_name,split_amount FROM invest_fund_payment_split WHERE payment_id=#{paymentId}</select>
+  <insert id="insertInvestFundPaymentSplit" useGeneratedKeys="true" keyProperty="splitId">INSERT INTO invest_fund_payment_split(payment_id,item_id,source_id,source_name,split_amount) VALUES(#{paymentId},#{itemId},#{sourceId},#{sourceName},#{splitAmount})</insert>
+  <delete id="deleteByPaymentId">DELETE FROM invest_fund_payment_split WHERE payment_id=#{paymentId}</delete>
+</mapper>

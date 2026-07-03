@@ -1,0 +1,2 @@
+package com.ruoyi.modules.invest.benefit.calculation.mapper;
+import com.ruoyi.modules.invest.benefit.calculation.domain.InvestBenefitCalcItem;import org.apache.ibatis.annotations.Mapper;import java.util.List;@Mapper public interface InvestBenefitCalcItemMapper{List<InvestBenefitCalcItem> selectByCalcId(Long calcId);int insert(InvestBenefitCalcItem item);int deleteByCalcId(Long calcId);}

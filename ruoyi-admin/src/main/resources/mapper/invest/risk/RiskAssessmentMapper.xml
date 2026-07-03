@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.risk.mapper.RiskAssessmentMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.risk.domain.RiskAssessment">
+        <id column="risk_id" property="riskId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="assessment_title" property="assessmentTitle"/>
+        <result column="market_risk_score" property="marketRiskScore"/>
+        <result column="finance_risk_score" property="financeRiskScore"/>
+        <result column="tech_risk_score" property="techRiskScore"/>
+        <result column="management_risk_score" property="managementRiskScore"/>
+        <result column="policy_risk_score" property="policyRiskScore"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="conclusion" property="conclusion"/>
+        <result column="attachments" property="attachments"/>
+        <result column="assessment_status" property="assessmentStatus"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="assessor_id" property="assessorId"/>
+        <result column="assessor_name" property="assessorName"/>
+        <result column="assessment_time" property="assessmentTime"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        risk_id, project_id, project_name, assessment_title, market_risk_score, finance_risk_score,
+        tech_risk_score, management_risk_score, policy_risk_score, total_score, risk_level, conclusion,
+        attachments, assessment_status, process_instance_id, assessor_id, assessor_name, assessment_time,
+        del_flag, create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectRiskAssessmentById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM risk_assessment
+        WHERE risk_id = #{riskId} AND del_flag = '0'
+    </select>
+
+    <select id="selectRiskAssessmentList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM risk_assessment
+        WHERE del_flag = '0'
+        <if test="projectId != null">AND project_id = #{projectId}</if>
+        <if test="riskLevel != null and riskLevel != ''">AND risk_level = #{riskLevel}</if>
+        <if test="assessmentStatus != null and assessmentStatus != ''">AND assessment_status = #{assessmentStatus}</if>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insertRiskAssessment" useGeneratedKeys="true" keyProperty="riskId">
+        INSERT INTO risk_assessment (
+            project_id, project_name, assessment_title, market_risk_score, finance_risk_score,
+            tech_risk_score, management_risk_score, policy_risk_score, total_score, risk_level,
+            conclusion, attachments, assessment_status, process_instance_id, assessor_id, assessor_name,
+            assessment_time, del_flag, create_by, create_time, remark
+        ) VALUES (
+            #{projectId}, #{projectName}, #{assessmentTitle}, #{marketRiskScore}, #{financeRiskScore},
+            #{techRiskScore}, #{managementRiskScore}, #{policyRiskScore}, #{totalScore}, #{riskLevel},
+            #{conclusion}, #{attachments}, #{assessmentStatus}, #{processInstanceId}, #{assessorId}, #{assessorName},
+            #{assessmentTime}, #{delFlag}, #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <update id="updateRiskAssessment">
+        UPDATE risk_assessment
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="assessmentTitle != null">assessment_title = #{assessmentTitle},</if>
+            <if test="marketRiskScore != null">market_risk_score = #{marketRiskScore},</if>
+            <if test="financeRiskScore != null">finance_risk_score = #{financeRiskScore},</if>
+            <if test="techRiskScore != null">tech_risk_score = #{techRiskScore},</if>
+            <if test="managementRiskScore != null">management_risk_score = #{managementRiskScore},</if>
+            <if test="policyRiskScore != null">policy_risk_score = #{policyRiskScore},</if>
+            <if test="totalScore != null">total_score = #{totalScore},</if>
+            <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+            <if test="conclusion != null">conclusion = #{conclusion},</if>
+            <if test="attachments != null">attachments = #{attachments},</if>
+            <if test="assessmentStatus != null">assessment_status = #{assessmentStatus},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="assessmentTime != null">assessment_time = #{assessmentTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE risk_id = #{riskId} AND del_flag = '0'
+    </update>
+
+    <delete id="deleteRiskAssessmentByIds">
+        UPDATE risk_assessment SET del_flag = '2' WHERE risk_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM risk_assessment
+        WHERE project_id = #{projectId} AND del_flag = '0' ORDER BY create_time DESC LIMIT 1
+    </select>
+</mapper>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/BPMN/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" type="Language" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+
+  <process id="invest_project_approval" isExecutable="true" name="投资项目审批流程">
+    <startEvent id="start" name="开始">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="leaderApproval" />
+
+    <userTask id="leaderApproval" name="部门负责人审批" flowable:assignee="${initiatorName}">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="leaderApproval" targetRef="managerApproval" />
+
+    <userTask id="managerApproval" name="部门经理审批">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="managerApproval" targetRef="decision" />
+
+    <exclusiveGateway id="decision" name="审批结果判断">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+      <outgoing>flow5</outgoing>
+    </exclusiveGateway>
+
+    <sequenceFlow id="flow4" sourceRef="decision" targetRef="dueDiligence">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${outcome == 'approve'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flow5" sourceRef="decision" targetRef="endRejected">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${outcome == 'reject'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="dueDiligence" name="尽职调查">
+      <incoming>flow4</incoming>
+      <outgoing>flow6</outgoing>
+    </userTask>
+    <sequenceFlow id="flow6" sourceRef="dueDiligence" targetRef="riskAssessment" />
+
+    <userTask id="riskAssessment" name="风险评估">
+      <incoming>flow6</incoming>
+      <outgoing>flow7</outgoing>
+    </userTask>
+    <sequenceFlow id="flow7" sourceRef="riskAssessment" targetRef="finalApproval" />
+
+    <userTask id="finalApproval" name="最终审批">
+      <incoming>flow7</incoming>
+      <outgoing>flow8</outgoing>
+    </userTask>
+    <sequenceFlow id="flow8" sourceRef="finalApproval" targetRef="finalDecision" />
+
+    <exclusiveGateway id="finalDecision" name="最终审批结果">
+      <incoming>flow8</incoming>
+      <outgoing>flow9</outgoing>
+      <outgoing>flow10</outgoing>
+    </exclusiveGateway>
+
+    <sequenceFlow id="flow9" sourceRef="finalDecision" targetRef="endApproved">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${outcome == 'approve'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flow10" sourceRef="finalDecision" targetRef="endRejected">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${outcome == 'reject'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <endEvent id="endApproved" name="审批通过">
+      <incoming>flow9</incoming>
+    </endEvent>
+
+    <endEvent id="endRejected" name="审批驳回">
+      <incoming>flow5</incoming>
+      <incoming>flow10</incoming>
+    </endEvent>
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_invest_project_approval">
+    <bpmndi:BPMNPlane bpmnElement="invest_project_approval" id="BPMNPlane_invest_project_approval">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds width="36" height="36" x="50" y="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="leaderApproval" id="BPMNShape_leaderApproval">
+        <omgdc:Bounds width="100" height="80" x="150" y="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="managerApproval" id="BPMNShape_managerApproval">
+        <omgdc:Bounds width="100" height="80" x="300" y="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="decision" id="BPMNShape_decision">
+        <omgdc:Bounds width="40" height="40" x="450" y="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="dueDiligence" id="BPMNShape_dueDiligence">
+        <omgdc:Bounds width="100" height="80" x="550" y="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="riskAssessment" id="BPMNShape_riskAssessment">
+        <omgdc:Bounds width="100" height="80" x="700" y="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="finalApproval" id="BPMNShape_finalApproval">
+        <omgdc:Bounds width="100" height="80" x="850" y="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="finalDecision" id="BPMNShape_finalDecision">
+        <omgdc:Bounds width="40" height="40" x="1000" y="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endApproved" id="BPMNShape_endApproved">
+        <omgdc:Bounds width="36" height="36" x="1100" y="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endRejected" id="BPMNShape_endRejected">
+        <omgdc:Bounds width="36" height="36" x="500" y="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="86" y="118" />
+        <omgdi:waypoint x="150" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="250" y="120" />
+        <omgdi:waypoint x="300" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="400" y="120" />
+        <omgdi:waypoint x="470" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="490" y="110" />
+        <omgdi:waypoint x="550" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="470" y="140" />
+        <omgdi:waypoint x="518" y="182" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="650" y="90" />
+        <omgdi:waypoint x="700" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="800" y="90" />
+        <omgdi:waypoint x="850" y="90" />
+      </bpmndi:BPMNEdge>
+      <BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="950" y="90" />
+        <omgdi:waypoint x="1020" y="90" />
+      </BPMNEdge>
+      <BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="1040" y="80" />
+        <omgdi:waypoint x="1118" y="68" />
+      </BPMNEdge>
+      <BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="1040" y="110" />
+        <omgdi:waypoint x="536" y="182" />
+      </BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

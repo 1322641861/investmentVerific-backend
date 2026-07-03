@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.plan.budget.mapper.InvestBudgetItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.plan.budget.domain.InvestBudgetItem">
+        <id column="item_id" property="itemId"/>
+        <result column="budget_id" property="budgetId"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_code" property="projectCode"/>
+        <result column="project_name" property="projectName"/>
+        <result column="proposed_amount" property="proposedAmount"/>
+        <result column="allocated_amount" property="allocatedAmount"/>
+        <result column="item_type" property="itemType"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        item_id, budget_id, scheme_id, project_id, project_code, project_name,
+        proposed_amount, allocated_amount, item_type, order_num,
+        create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectInvestBudgetItemById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_budget_item
+        WHERE item_id = #{itemId}
+    </select>
+
+    <select id="selectInvestBudgetItemList" parameterType="InvestBudgetItem" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_budget_item
+        WHERE 1 = 1
+        <if test="budgetId != null">AND budget_id = #{budgetId}</if>
+        <if test="schemeId != null">AND scheme_id = #{schemeId}</if>
+        <if test="projectId != null">AND project_id = #{projectId}</if>
+        <if test="itemType != null and itemType != ''">AND item_type = #{itemType}</if>
+        ORDER BY order_num ASC, item_id ASC
+    </select>
+
+    <select id="selectItemsByBudgetId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_budget_item
+        WHERE budget_id = #{budgetId}
+        ORDER BY order_num ASC, item_id ASC
+    </select>
+
+    <insert id="insertInvestBudgetItem" parameterType="InvestBudgetItem" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO invest_budget_item (
+            budget_id, scheme_id, project_id, project_code, project_name,
+            proposed_amount, allocated_amount, item_type, order_num,
+            create_by, create_time, remark
+        ) VALUES (
+            #{budgetId}, #{schemeId}, #{projectId}, #{projectCode}, #{projectName},
+            #{proposedAmount}, #{allocatedAmount}, #{itemType}, #{orderNum},
+            #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <insert id="batchInsertInvestBudgetItem" parameterType="java.util.List">
+        INSERT INTO invest_budget_item (
+            budget_id, scheme_id, project_id, project_code, project_name,
+            proposed_amount, allocated_amount, item_type, order_num,
+            create_by, create_time, remark
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.budgetId}, #{item.schemeId}, #{item.projectId}, #{item.projectCode}, #{item.projectName},
+             #{item.proposedAmount}, #{item.allocatedAmount}, #{item.itemType}, #{item.orderNum},
+             #{item.createBy}, #{item.createTime}, #{item.remark})
+        </foreach>
+    </insert>
+
+    <update id="updateInvestBudgetItem" parameterType="InvestBudgetItem">
+        UPDATE invest_budget_item
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectCode != null">project_code = #{projectCode},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="proposedAmount != null">proposed_amount = #{proposedAmount},</if>
+            <if test="allocatedAmount != null">allocated_amount = #{allocatedAmount},</if>
+            <if test="itemType != null">item_type = #{itemType},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE item_id = #{itemId}
+    </update>
+
+    <delete id="deleteByBudgetId" parameterType="Long">
+        DELETE FROM invest_budget_item WHERE budget_id = #{budgetId}
+    </delete>
+
+    <delete id="deleteInvestBudgetItemByIds">
+        DELETE FROM invest_budget_item WHERE item_id IN
+        <foreach item="itemId" collection="array" open="(" separator="," close=")">
+            #{itemId}
+        </foreach>
+    </delete>
+</mapper>

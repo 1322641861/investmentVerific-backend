@@ -16,7 +16,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为80
-  port: 80
+  port: 8080
   servlet:
     # 应用的访问路径
     context-path: /
@@ -87,7 +87,7 @@ pagehelper:
 shiro:
   user:
     # 登录地址
-    loginUrl: /login
+    loginUrl: /unauth-json
     # 权限认证失败地址
     unauthorizedUrl: /unauth
     # 首页地址
@@ -106,7 +106,7 @@ shiro:
     # 设置Cookie的过期时间，天为单位
     maxAge: 30
     # 设置密钥，务必保持唯一性（生成方式，直接拷贝到main运行即可）Base64.encodeToString(CipherUtils.generateNewKey(128, "AES").getEncoded()) （默认启动生成随机秘钥，随机秘钥会导致之前客户端RememberMe Cookie无效，如设置固定秘钥RememberMe Cookie则有效）
-    cipherKey:
+    cipherKey: 7AvVhmFLUs0KTA3Kprsdag==
   session:
     # Session超时时间，-1代表永不过期（默认30分钟）
     expireTime: 30
@@ -151,3 +151,10 @@ csrf:
   enabled: false
   # 白名单（多个用逗号分隔）
   whites: /druid
+
+# MinIO文件存储配置
+minio:
+  endpoint: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin@2024
+  bucket: investvf

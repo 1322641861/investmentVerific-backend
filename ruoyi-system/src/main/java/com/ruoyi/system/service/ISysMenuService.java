@@ -144,4 +144,13 @@ public interface ISysMenuService
      * @return 结果
      */
     public boolean checkMenuNameUnique(SysMenu menu);
+
+    /**
+     * 构建前端路由所需的菜单树（DB驱动）
+     * 替代 VueLoginController 中硬编码的 getRouters()
+     *
+     * @param userId 用户ID
+     * @return 路由树列表
+     */
+    public List<Map<String, Object>> buildRouters(Long userId);
 }

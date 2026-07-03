@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.duediligence.mapper.DueDiligenceMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.duediligence.domain.DueDiligence">
+        <id column="due_diligence_id" property="dueDiligenceId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="report_title" property="reportTitle"/>
+        <result column="due_diligence_content" property="dueDiligenceContent"/>
+        <result column="finance_conclusion" property="financeConclusion"/>
+        <result column="legal_conclusion" property="legalConclusion"/>
+        <result column="market_conclusion" property="marketConclusion"/>
+        <result column="overall_conclusion" property="overallConclusion"/>
+        <result column="attachments" property="attachments"/>
+        <result column="dd_status" property="ddStatus"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="leader_id" property="leaderId"/>
+        <result column="leader_name" property="leaderName"/>
+        <result column="start_time" property="startTime"/>
+        <result column="finish_time" property="finishTime"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        due_diligence_id, project_id, project_name, report_title, due_diligence_content, finance_conclusion,
+        legal_conclusion, market_conclusion, overall_conclusion, attachments, dd_status, process_instance_id,
+        leader_id, leader_name, start_time, finish_time, del_flag, create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectDueDiligenceById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM due_diligence
+        WHERE due_diligence_id = #{dueDiligenceId} AND del_flag = '0'
+    </select>
+
+    <select id="selectDueDiligenceList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM due_diligence
+        WHERE del_flag = '0'
+        <if test="projectId != null">AND project_id = #{projectId}</if>
+        <if test="ddStatus != null and ddStatus != ''">AND dd_status = #{ddStatus}</if>
+        <if test="reportTitle != null and reportTitle != ''">
+            AND report_title LIKE CONCAT('%', #{reportTitle}, '%')
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insertDueDiligence" useGeneratedKeys="true" keyProperty="dueDiligenceId">
+        INSERT INTO due_diligence (
+            project_id, project_name, report_title, due_diligence_content, finance_conclusion,
+            legal_conclusion, market_conclusion, overall_conclusion, attachments, dd_status,
+            process_instance_id, leader_id, leader_name, start_time, finish_time, del_flag,
+            create_by, create_time, remark
+        ) VALUES (
+            #{projectId}, #{projectName}, #{reportTitle}, #{dueDiligenceContent}, #{financeConclusion},
+            #{legalConclusion}, #{marketConclusion}, #{overallConclusion}, #{attachments}, #{ddStatus},
+            #{processInstanceId}, #{leaderId}, #{leaderName}, #{startTime}, #{finishTime}, #{delFlag},
+            #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <update id="updateDueDiligence">
+        UPDATE due_diligence
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="reportTitle != null">report_title = #{reportTitle},</if>
+            <if test="dueDiligenceContent != null">due_diligence_content = #{dueDiligenceContent},</if>
+            <if test="financeConclusion != null">finance_conclusion = #{financeConclusion},</if>
+            <if test="legalConclusion != null">legal_conclusion = #{legalConclusion},</if>
+            <if test="marketConclusion != null">market_conclusion = #{marketConclusion},</if>
+            <if test="overallConclusion != null">overall_conclusion = #{overallConclusion},</if>
+            <if test="attachments != null">attachments = #{attachments},</if>
+            <if test="ddStatus != null">dd_status = #{ddStatus},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="finishTime != null">finish_time = #{finishTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE due_diligence_id = #{dueDiligenceId} AND del_flag = '0'
+    </update>
+
+    <delete id="deleteDueDiligenceByIds">
+        UPDATE due_diligence SET del_flag = '2' WHERE due_diligence_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM due_diligence
+        WHERE project_id = #{projectId} AND del_flag = '0' ORDER BY create_time DESC LIMIT 1
+    </select>
+</mapper>

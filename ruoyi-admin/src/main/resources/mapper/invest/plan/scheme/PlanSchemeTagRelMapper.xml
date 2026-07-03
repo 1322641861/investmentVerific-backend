@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.plan.scheme.mapper.PlanSchemeTagRelMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.plan.scheme.domain.PlanSchemeTagRel">
+        <id column="rel_id" property="relId"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="tag_id" property="tagId"/>
+    </resultMap>
+
+    <select id="selectPlanSchemeTagRelBySchemeId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT rel_id, scheme_id, tag_id
+        FROM plan_scheme_tag_rel
+        WHERE scheme_id = #{schemeId}
+    </select>
+
+    <insert id="insertPlanSchemeTagRel" parameterType="PlanSchemeTagRel" useGeneratedKeys="true" keyProperty="relId">
+        INSERT INTO plan_scheme_tag_rel (scheme_id, tag_id)
+        VALUES (#{schemeId}, #{tagId})
+    </insert>
+
+    <delete id="deleteBySchemeId" parameterType="Long">
+        DELETE FROM plan_scheme_tag_rel WHERE scheme_id = #{schemeId}
+    </delete>
+
+    <delete id="deleteByTagIds">
+        DELETE FROM plan_scheme_tag_rel WHERE tag_id IN
+        <foreach item="tagId" collection="array" open="(" separator="," close=")">
+            #{tagId}
+        </foreach>
+    </delete>
+</mapper>

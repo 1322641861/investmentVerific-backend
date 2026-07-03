@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.postinvest.mapper.PostInvestTrackingMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.postinvest.domain.PostInvestTracking">
+        <id column="tracking_id" property="trackingId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="tracking_period" property="trackingPeriod"/>
+        <result column="tracking_year" property="trackingYear"/>
+        <result column="revenue" property="revenue"/>
+        <result column="net_profit" property="netProfit"/>
+        <result column="net_asset" property="netAsset"/>
+        <result column="debt_ratio" property="debtRatio"/>
+        <result column="growth_rate" property="growthRate"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="risk_note" property="riskNote"/>
+        <result column="report_content" property="reportContent"/>
+        <result column="attachments" property="attachments"/>
+        <result column="tracking_status" property="trackingStatus"/>
+        <result column="tracker_id" property="trackerId"/>
+        <result column="tracker_name" property="trackerName"/>
+        <result column="tracking_date" property="trackingDate"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tracking_id, project_id, project_name, tracking_period, tracking_year, revenue, net_profit,
+        net_asset, debt_ratio, growth_rate, risk_level, risk_note, report_content, attachments,
+        tracking_status, tracker_id, tracker_name, tracking_date, del_flag, create_by, create_time,
+        update_by, update_time, remark
+    </sql>
+
+    <select id="selectPostInvestTrackingById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM post_invest_tracking
+        WHERE tracking_id = #{trackingId} AND del_flag = '0'
+    </select>
+
+    <select id="selectPostInvestTrackingList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM post_invest_tracking
+        WHERE del_flag = '0'
+        <if test="projectId != null">AND project_id = #{projectId}</if>
+        <if test="trackingYear != null">AND tracking_year = #{trackingYear}</if>
+        <if test="riskLevel != null and riskLevel != ''">AND risk_level = #{riskLevel}</if>
+        <if test="trackingStatus != null and trackingStatus != ''">AND tracking_status = #{trackingStatus}</if>
+        ORDER BY tracking_year DESC, tracking_period DESC
+    </select>
+
+    <insert id="insertPostInvestTracking" useGeneratedKeys="true" keyProperty="trackingId">
+        INSERT INTO post_invest_tracking (
+            project_id, project_name, tracking_period, tracking_year, revenue, net_profit,
+            net_asset, debt_ratio, growth_rate, risk_level, risk_note, report_content, attachments,
+            tracking_status, tracker_id, tracker_name, tracking_date, del_flag, create_by, create_time, remark
+        ) VALUES (
+            #{projectId}, #{projectName}, #{trackingPeriod}, #{trackingYear}, #{revenue}, #{netProfit},
+            #{netAsset}, #{debtRatio}, #{growthRate}, #{riskLevel}, #{riskNote}, #{reportContent}, #{attachments},
+            #{trackingStatus}, #{trackerId}, #{trackerName}, #{trackingDate}, #{delFlag}, #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <update id="updatePostInvestTracking">
+        UPDATE post_invest_tracking
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="revenue != null">revenue = #{revenue},</if>
+            <if test="netProfit != null">net_profit = #{netProfit},</if>
+            <if test="debtRatio != null">debt_ratio = #{debtRatio},</if>
+            <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+            <if test="reportContent != null">report_content = #{reportContent},</if>
+            <if test="trackingStatus != null">tracking_status = #{trackingStatus},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE tracking_id = #{trackingId} AND del_flag = '0'
+    </update>
+
+    <delete id="deletePostInvestTrackingByIds">
+        UPDATE post_invest_tracking SET del_flag = '2' WHERE tracking_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM post_invest_tracking
+        WHERE project_id = #{projectId} AND del_flag = '0' ORDER BY tracking_year DESC, tracking_period DESC
+    </select>
+</mapper>

@@ -58,6 +58,18 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     }
 
     /**
+     * 根据字典类型查询字典数据
+     * 
+     * @param dictType 字典类型
+     * @return 字典数据集合信息
+     */
+    @Override
+    public List<SysDictData> selectDictDataByType(String dictType)
+    {
+        return dictDataMapper.selectDictDataByType(dictType);
+    }
+
+    /**
      * 批量删除字典数据
      * 
      * @param ids 需要删除的数据

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.project.mapper.InvestProjectMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.project.domain.InvestProject">
+        <id column="project_id" property="projectId"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="scheme_code" property="schemeCode"/>
+        <result column="scheme_name" property="schemeName"/>
+        <result column="project_code" property="projectCode"/>
+        <result column="project_name" property="projectName"/>
+        <result column="project_type" property="projectType"/>
+        <result column="industry" property="industry"/>
+        <result column="region" property="region"/>
+        <result column="plan_year" property="planYear"/>
+        <result column="proposed_amount" property="proposedAmount"/>
+        <result column="invested_amount" property="investedAmount"/>
+        <result column="budget_amount" property="budgetAmount"/>
+        <result column="progress_rate" property="progressRate"/>
+        <result column="benefit_score" property="benefitScore"/>
+        <result column="priority" property="priority"/>
+        <result column="attachments" property="attachments"/>
+        <result column="project_status" property="projectStatus"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="leader_id" property="leaderId"/>
+        <result column="leader_name" property="leaderName"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="setup_time" property="setupTime"/>
+        <result column="expected_exit_time" property="expectedExitTime"/>
+        <result column="actual_exit_time" property="actualExitTime"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        project_id, scheme_id, scheme_code, scheme_name, project_code, project_name, project_type, industry, region,
+        plan_year, proposed_amount, invested_amount, budget_amount, progress_rate, benefit_score, priority, attachments,
+        project_status, process_instance_id, leader_id, leader_name, dept_id, setup_time, expected_exit_time,
+        actual_exit_time, del_flag, create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectInvestProjectById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_project
+        WHERE project_id = #{projectId} AND del_flag = '0'
+    </select>
+
+    <select id="selectInvestProjectList" parameterType="InvestProject" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_project
+        WHERE del_flag = '0'
+        <if test="schemeId != null">
+            AND scheme_id = #{schemeId}
+        </if>
+        <if test="schemeName != null and schemeName != ''">
+            AND scheme_name LIKE CONCAT('%', #{schemeName}, '%')
+        </if>
+        <if test="projectCode != null and projectCode != ''">
+            AND project_code LIKE CONCAT('%', #{projectCode}, '%')
+        </if>
+        <if test="projectName != null and projectName != ''">
+            AND project_name LIKE CONCAT('%', #{projectName}, '%')
+        </if>
+        <if test="projectType != null and projectType != ''">
+            AND project_type = #{projectType}
+        </if>
+        <if test="industry != null and industry != ''">
+            AND industry = #{industry}
+        </if>
+        <if test="priority != null and priority != ''">
+            AND priority = #{priority}
+        </if>
+        <if test="projectStatus != null and projectStatus != ''">
+            AND project_status = #{projectStatus}
+        </if>
+        <if test="planYear != null">
+            AND plan_year = #{planYear}
+        </if>
+        <if test="deptId != null">
+            AND dept_id = #{deptId}
+        </if>
+        ORDER BY create_time DESC, project_id DESC
+    </select>
+
+    <select id="selectInvestProjectBySchemeId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_project
+        WHERE scheme_id = #{schemeId} AND del_flag = '0'
+        ORDER BY create_time DESC, project_id DESC
+    </select>
+
+    <insert id="insertInvestProject" parameterType="InvestProject" useGeneratedKeys="true" keyProperty="projectId">
+        INSERT INTO invest_project (
+            scheme_id, scheme_code, scheme_name, project_code, project_name, project_type, industry, region, plan_year,
+            proposed_amount, invested_amount, budget_amount, progress_rate, benefit_score, priority, attachments,
+            project_status, process_instance_id, leader_id, leader_name, dept_id, setup_time, expected_exit_time,
+            del_flag, create_by, create_time, remark
+        ) VALUES (
+            #{schemeId}, #{schemeCode}, #{schemeName}, #{projectCode}, #{projectName}, #{projectType}, #{industry}, #{region}, #{planYear},
+            #{proposedAmount}, #{investedAmount}, #{budgetAmount}, #{progressRate}, #{benefitScore}, #{priority}, #{attachments},
+            #{projectStatus}, #{processInstanceId}, #{leaderId}, #{leaderName}, #{deptId}, #{setupTime}, #{expectedExitTime},
+            #{delFlag}, #{createBy}, #{createTime}, #{remark}
+        )
+    </insert>
+
+    <update id="updateInvestProject" parameterType="InvestProject">
+        UPDATE invest_project
+        <set>
+            <if test="schemeId != null">scheme_id = #{schemeId},</if>
+            <if test="schemeCode != null">scheme_code = #{schemeCode},</if>
+            <if test="schemeName != null">scheme_name = #{schemeName},</if>
+            <if test="projectCode != null">project_code = #{projectCode},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="projectType != null">project_type = #{projectType},</if>
+            <if test="industry != null">industry = #{industry},</if>
+            <if test="region != null">region = #{region},</if>
+            <if test="planYear != null">plan_year = #{planYear},</if>
+            <if test="proposedAmount != null">proposed_amount = #{proposedAmount},</if>
+            <if test="investedAmount != null">invested_amount = #{investedAmount},</if>
+            <if test="budgetAmount != null">budget_amount = #{budgetAmount},</if>
+            <if test="progressRate != null">progress_rate = #{progressRate},</if>
+            <if test="benefitScore != null">benefit_score = #{benefitScore},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="attachments != null">attachments = #{attachments},</if>
+            <if test="projectStatus != null">project_status = #{projectStatus},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="leaderId != null">leader_id = #{leaderId},</if>
+            <if test="leaderName != null">leader_name = #{leaderName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="setupTime != null">setup_time = #{setupTime},</if>
+            <if test="expectedExitTime != null">expected_exit_time = #{expectedExitTime},</if>
+            <if test="actualExitTime != null">actual_exit_time = #{actualExitTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE project_id = #{projectId} AND del_flag = '0'
+    </update>
+
+    <delete id="deleteInvestProjectById" parameterType="Long">
+        UPDATE invest_project SET del_flag = '2' WHERE project_id = #{projectId}
+    </delete>
+
+    <delete id="deleteInvestProjectByIds">
+        UPDATE invest_project SET del_flag = '2' WHERE project_id IN
+        <foreach item="projectId" collection="array" open="(" separator="," close=")">
+            #{projectId}
+        </foreach>
+    </delete>
+
+    <select id="selectProjectByProcessInstanceId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM invest_project
+        WHERE process_instance_id = #{processInstanceId} AND del_flag = '0'
+    </select>
+</mapper>

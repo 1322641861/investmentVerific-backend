@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.report.config.mapper.InvestReportConfigMapper">
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.report.config.domain.InvestReportConfig">
+        <id column="config_id" property="configId"/>
+        <result column="config_code" property="configCode"/>
+        <result column="config_name" property="configName"/>
+        <result column="report_type" property="reportType"/>
+        <result column="chart_type" property="chartType"/>
+        <result column="data_source" property="dataSource"/>
+        <result column="query_sql" property="querySql"/>
+        <result column="display_config" property="displayConfig"/>
+        <result column="refresh_interval" property="refreshInterval"/>
+        <result column="status" property="status"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    <sql id="cols">config_id,config_code,config_name,report_type,chart_type,data_source,query_sql,display_config,refresh_interval,status,order_num,del_flag,create_by,create_time,update_by,update_time,remark</sql>
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="cols"/> FROM invest_report_config WHERE config_id=#{id} AND del_flag='0'
+    </select>
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="cols"/> FROM invest_report_config WHERE del_flag='0'
+        <if test="configName!=null and configName!=''"> AND config_name LIKE CONCAT('%',#{configName},'%')</if>
+        <if test="reportType!=null and reportType!=''"> AND report_type=#{reportType}</if>
+        <if test="status!=null and status!=''"> AND status=#{status}</if>
+        ORDER BY order_num ASC
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="configId">
+        INSERT INTO invest_report_config(config_code,config_name,report_type,chart_type,data_source,query_sql,display_config,refresh_interval,status,order_num,del_flag,create_by,create_time,remark)
+        VALUES(#{configCode},#{configName},#{reportType},#{chartType},#{dataSource},#{querySql},#{displayConfig},#{refreshInterval},#{status},#{orderNum},#{delFlag},#{createBy},#{createTime},#{remark})
+    </insert>
+    <update id="update">
+        UPDATE invest_report_config
+        <set>
+            <if test="configCode!=null">config_code=#{configCode},</if>
+            <if test="configName!=null">config_name=#{configName},</if>
+            <if test="reportType!=null">report_type=#{reportType},</if>
+            <if test="chartType!=null">chart_type=#{chartType},</if>
+            <if test="dataSource!=null">data_source=#{dataSource},</if>
+            <if test="querySql!=null">query_sql=#{querySql},</if>
+            <if test="displayConfig!=null">display_config=#{displayConfig},</if>
+            <if test="refreshInterval!=null">refresh_interval=#{refreshInterval},</if>
+            <if test="status!=null">status=#{status},</if>
+            <if test="orderNum!=null">order_num=#{orderNum},</if>
+            <if test="updateBy!=null">update_by=#{updateBy},</if>
+            <if test="updateTime!=null">update_time=#{updateTime},</if>
+        </set>
+        WHERE config_id=#{configId}
+    </update>
+    <delete id="deleteByIds">
+        UPDATE invest_report_config SET del_flag='2' WHERE config_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </delete>
+</mapper>

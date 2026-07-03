@@ -1,0 +1,2 @@
+package com.ruoyi.modules.invest.benefit.evaluation.service;
+import com.ruoyi.modules.invest.benefit.evaluation.domain.InvestBenefitEvaluation;import java.util.List;public interface IInvestBenefitEvaluationService{InvestBenefitEvaluation selectById(Long id);List<InvestBenefitEvaluation> selectList(InvestBenefitEvaluation e);int insert(InvestBenefitEvaluation e);int update(InvestBenefitEvaluation e);int deleteByIds(Long[] ids);boolean calculate(Long id);}

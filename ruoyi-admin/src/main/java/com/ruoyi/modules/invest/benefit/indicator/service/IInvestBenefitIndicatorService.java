@@ -1,0 +1,2 @@
+package com.ruoyi.modules.invest.benefit.indicator.service;
+import com.ruoyi.modules.invest.benefit.indicator.domain.InvestBenefitIndicator;import java.util.List;public interface IInvestBenefitIndicatorService{InvestBenefitIndicator selectById(Long id);List<InvestBenefitIndicator> selectList(InvestBenefitIndicator i);int insert(InvestBenefitIndicator i);int update(InvestBenefitIndicator i);int deleteByIds(Long[] ids);}

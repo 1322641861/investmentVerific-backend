@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.modules.invest.plan.scheme.mapper.PlanSchemeVersionMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.modules.invest.plan.scheme.domain.PlanSchemeVersion">
+        <id column="version_id" property="versionId"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="version_no" property="versionNo"/>
+        <result column="change_log" property="changeLog"/>
+        <result column="snapshot_json" property="snapshotJson"/>
+        <result column="is_current" property="isCurrent"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        version_id, scheme_id, version_no, change_log, snapshot_json, is_current, create_by, create_time
+    </sql>
+
+    <select id="selectPlanSchemeVersionById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM plan_scheme_version
+        WHERE version_id = #{versionId}
+    </select>
+
+    <select id="selectPlanSchemeVersionList" parameterType="PlanSchemeVersion" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM plan_scheme_version
+        WHERE 1 = 1
+        <if test="schemeId != null">
+            AND scheme_id = #{schemeId}
+        </if>
+        <if test="isCurrent != null and isCurrent != ''">
+            AND is_current = #{isCurrent}
+        </if>
+        ORDER BY version_no DESC, create_time DESC
+    </select>
+
+    <insert id="insertPlanSchemeVersion" parameterType="PlanSchemeVersion" useGeneratedKeys="true" keyProperty="versionId">
+        INSERT INTO plan_scheme_version (
+            scheme_id, version_no, change_log, snapshot_json, is_current, create_by, create_time
+        ) VALUES (
+            #{schemeId}, #{versionNo}, #{changeLog}, #{snapshotJson}, #{isCurrent}, #{createBy}, #{createTime}
+        )
+    </insert>
+
+    <update id="clearCurrentBySchemeId" parameterType="Long">
+        UPDATE plan_scheme_version SET is_current = '0' WHERE scheme_id = #{schemeId}
+    </update>
+
+    <select id="selectMaxVersionNo" parameterType="Long" resultType="Integer">
+        SELECT MAX(version_no) FROM plan_scheme_version WHERE scheme_id = #{schemeId}
+    </select>
+</mapper>
