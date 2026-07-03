@@ -1,5 +1,6 @@
 package com.ruoyi.modules.invest.plan.fund.arrival.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ public class InvestFundArrival extends BaseEntity {
     private Long itemId;
     private Long sourceId;
     private BigDecimal arrivedAmount;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date arrivedDate;
     private String payerName;
     private String voucherNo;
