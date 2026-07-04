@@ -1,5 +1,6 @@
 package com.ruoyi.modules.invest.plan.fund.payment.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,7 +27,9 @@ public class InvestFundPayment extends BaseEntity {
     private String purpose;
     private String attachment;
     private String payStatus;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date applyDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date payDate;
     private String processInstanceId;
     private List<InvestFundPaymentSplit> splitList;

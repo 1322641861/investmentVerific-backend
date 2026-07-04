@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 /**
@@ -90,11 +91,13 @@ public class DueDiligence extends BaseEntity {
     /**
      * 开始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startTime;
 
     /**
      * 完成时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date finishTime;
 
     /**

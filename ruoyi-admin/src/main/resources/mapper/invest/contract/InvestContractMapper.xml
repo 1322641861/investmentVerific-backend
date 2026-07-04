@@ -70,13 +70,21 @@
         UPDATE invest_contract
         <set>
             <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
             <if test="contractNo != null">contract_no = #{contractNo},</if>
             <if test="contractName != null">contract_name = #{contractName},</if>
             <if test="contractType != null">contract_type = #{contractType},</if>
             <if test="investAmount != null">invest_amount = #{investAmount},</if>
             <if test="shareRatio != null">share_ratio = #{shareRatio},</if>
+            <if test="investor != null">investor = #{investor},</if>
+            <if test="funder != null">funder = #{funder},</if>
+            <if test="signDate != null">sign_date = #{signDate},</if>
+            <if test="effectiveDate != null">effective_date = #{effectiveDate},</if>
+            <if test="expireDate != null">expire_date = #{expireDate},</if>
             <if test="contractStatus != null">contract_status = #{contractStatus},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
             <if test="filePath != null">file_path = #{filePath},</if>
+            <if test="remark != null">remark = #{remark},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </set>

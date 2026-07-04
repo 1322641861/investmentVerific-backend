@@ -1,5 +1,6 @@
 package com.ruoyi.modules.invest.plan.fund.plan.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -27,6 +28,7 @@ public class FundMatchingStatVO implements Serializable {
     private BigDecimal paidRate = BigDecimal.ZERO;
     private String planStatus;
     private String planStatusLabel;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date lastCheckTime;
     private String warningLevel; // green/yellow/red
 }

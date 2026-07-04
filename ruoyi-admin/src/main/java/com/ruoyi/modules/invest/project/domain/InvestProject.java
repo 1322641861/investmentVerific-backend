@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -131,16 +132,19 @@ public class InvestProject extends BaseEntity {
     /**
      * 立项时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date setupTime;
 
     /**
      * 预计退出时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date expectedExitTime;
 
     /**
      * 实际退出时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualExitTime;
 
     /**

@@ -67,6 +67,7 @@
         UPDATE due_diligence
         <set>
             <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
             <if test="reportTitle != null">report_title = #{reportTitle},</if>
             <if test="dueDiligenceContent != null">due_diligence_content = #{dueDiligenceContent},</if>
             <if test="financeConclusion != null">finance_conclusion = #{financeConclusion},</if>
@@ -76,7 +77,11 @@
             <if test="attachments != null">attachments = #{attachments},</if>
             <if test="ddStatus != null">dd_status = #{ddStatus},</if>
             <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="leaderId != null">leader_id = #{leaderId},</if>
+            <if test="leaderName != null">leader_name = #{leaderName},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
             <if test="finishTime != null">finish_time = #{finishTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </set>

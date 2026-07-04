@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -106,6 +107,7 @@ public class RiskAssessment extends BaseEntity {
     /**
      * 评估时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date assessmentTime;
 
     /**

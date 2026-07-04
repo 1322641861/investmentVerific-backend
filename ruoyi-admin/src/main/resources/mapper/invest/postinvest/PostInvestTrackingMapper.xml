@@ -67,12 +67,23 @@
         UPDATE post_invest_tracking
         <set>
             <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="trackingPeriod != null">tracking_period = #{trackingPeriod},</if>
+            <if test="trackingYear != null">tracking_year = #{trackingYear},</if>
             <if test="revenue != null">revenue = #{revenue},</if>
             <if test="netProfit != null">net_profit = #{netProfit},</if>
+            <if test="netAsset != null">net_asset = #{netAsset},</if>
             <if test="debtRatio != null">debt_ratio = #{debtRatio},</if>
+            <if test="growthRate != null">growth_rate = #{growthRate},</if>
             <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+            <if test="riskNote != null">risk_note = #{riskNote},</if>
             <if test="reportContent != null">report_content = #{reportContent},</if>
+            <if test="attachments != null">attachments = #{attachments},</if>
             <if test="trackingStatus != null">tracking_status = #{trackingStatus},</if>
+            <if test="trackerId != null">tracker_id = #{trackerId},</if>
+            <if test="trackerName != null">tracker_name = #{trackerName},</if>
+            <if test="trackingDate != null">tracking_date = #{trackingDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </set>

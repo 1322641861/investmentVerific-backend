@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -71,16 +72,19 @@ public class InvestContract extends BaseEntity {
     /**
      * 签订日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date signDate;
 
     /**
      * 生效日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date effectiveDate;
 
     /**
      * 到期日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date expireDate;
 
     /**

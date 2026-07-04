@@ -69,6 +69,8 @@
         <set>
             <if test="projectId != null">project_id = #{projectId},</if>
             <if test="assessmentTitle != null">assessment_title = #{assessmentTitle},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="assessorName != null">assessor_name = #{assessorName},</if>
             <if test="marketRiskScore != null">market_risk_score = #{marketRiskScore},</if>
             <if test="financeRiskScore != null">finance_risk_score = #{financeRiskScore},</if>
             <if test="techRiskScore != null">tech_risk_score = #{techRiskScore},</if>
